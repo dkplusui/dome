@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+
+      .map {
+        width: 200px;
+        height: 200px;
+        margin: 0 auto;
+        position: relative;
+        border: 1px solid red;
+        margin-top: 100px;
+      }
+      .map-item {
+        display: flex;
+        position: absolute;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        background: red;
+        color: #fff;
+        align-items: center;
+        z-index: -1;
+        justify-content: center;
+        transition: 0.5s ease;
+      }
+      .map-item span {
+        display: block;
+        width: 5px;
+        height: 5px;
+        text-align: center;
+        line-height: 5px;
+        border-radius: 50%;
+      }
+      .line-x {
+        position: absolute;
+        width: 200px;
+        height: 1px;
+        background: red;
+        margin-top: 50%;
+        z-index: -1;
+      }
+      .line-y {
+        position: absolute;
+        width: 1px;
+        height: 200px;
+        background: red;
+        margin-left: 50%;
+        z-index: -1;
+      }
+      .mask {
+        position: absolute;
+        width: 220px;
+        height: 120px;
+        background: red;
+        left: -10px;
+        top: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="map">
+      <div class="mask"></div>
+      <div class="line-x"></div>
+      <div class="line-y"></div>
+      <div class="map-item"><span>1</span></div>
+      <div class="map-item"><span>2</span></div>
+      <div class="map-item"><span>3</span></div>
+      <div class="map-item"><span>4</span></div>
+      <div class="map-item"><span>5</span></div>
+      <div class="map-item"><span>6</span></div>
+    </div>
+
+    <script>
+      const r = 100;
+      const cx = 100;
+      const cy = 100;
+
+      let reg = 0;
+
+      const dom = document.querySelectorAll(".map-item");
+
+      for (let i = 0; i < dom.length; i++) {
+        reg += 30;
+        dom[i].setAttribute(
+          "style",
+          `left:${cx + r * Math.cos((reg * Math.PI) / 180) - 10}px;top:${
+            cy + r * Math.sin((reg * Math.PI) / 180) - 10
+          }px`
+        );
+        dom[i].setAttribute("reg", reg);
+      }
+      let flag = true;
+      var startX, startY, endX, endY;
+
+      // 监听触摸开始事件
+      document.addEventListener("touchstart", function (event) {
+        startX = event.touches[0].clientX;
+        startY = event.touches[0].clientY;
+      });
+
+      // 监听触摸结束事件
+      let regs = 0;
+      document.addEventListener("touchend", function (event) {
+        endX = event.changedTouches[0].clientX;
+        endY = event.changedTouches[0].clientY;
+
+        var deltaX = endX - startX;
+        var deltaY = endY - startY;
+
+        // 判断滑动方向
+        if (Math.abs(deltaX) > Math.abs(deltaY)) {
+          if (deltaX > 0) {
+            // 向右滑动
+
+            for (let i = 0; i < dom.length; i++) {
+              const dreg = Number(dom[i].getAttribute("reg")) - 30;
+              dom[i].setAttribute("reg", dreg);
+              dom[i].setAttribute(
+                "style",
+                `left:${cx + r * Math.cos((dreg * Math.PI) / 180) - 10}px;top:${
+                  cy + r * Math.sin((dreg * Math.PI) / 180) - 10
+                }px`
+              );
+            }
+          } else {
+            // 向左滑动
+            for (let i = 0; i < dom.length; i++) {
+              const dreg = Number(dom[i].getAttribute("reg")) + 30;
+              dom[i].setAttribute("reg", dreg);
+              dom[i].setAttribute(
+                "style",
+                `left:${cx + r * Math.cos((dreg * Math.PI) / 180) - 10}px;top:${
+                  cy + r * Math.sin((dreg * Math.PI) / 180) - 10
+                }px`
+              );
+            }
+
+            dom[5].setAttribute(
+              "style",
+              `left:${cx + r * Math.cos((0 * Math.PI) / 180) - 10}px;top:${
+                cy + r * Math.sin((0 * Math.PI) / 180) - 10
+              }px; `
+            );
+
+            setTimeout(() => {
+              dom[5].setAttribute(
+                "style",
+                `left:${cx + r * Math.cos((45 * Math.PI) / 180) - 10}px;top:${
+                  cy + r * Math.sin((45 * Math.PI) / 180) - 10
+                }px;  transition: 0.3s ease;`
+              );
+            }, 500);
+            setTimeout(() => {
+              dom[5].setAttribute(
+                "style",
+                `left:${cx + r * Math.cos((30 * Math.PI) / 180) - 10}px;top:${
+                  cy + r * Math.sin((30 * Math.PI) / 180) - 10
+                }px;  transition: 1s ease;`
+              );
+            }, 800);
+          }
+        }
+      });
+    </script>
+  </body>
+</html>

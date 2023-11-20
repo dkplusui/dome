@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+
+      .map {
+        width: 200px;
+        height: 200px;
+        margin: 0 auto;
+        position: relative;
+        border: 1px solid red;
+        margin-top: 100px;
+      }
+      .map-item {
+        display: flex;
+        position: absolute;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        background: red;
+        color: #fff;
+        align-items: center;
+
+        justify-content: center;
+        transition: 0.5s ease;
+        cursor: pointer;
+      }
+      .map-item span {
+        display: block;
+        width: 5px;
+        height: 5px;
+        text-align: center;
+        line-height: 5px;
+        border-radius: 50%;
+      }
+      .line-x {
+        position: absolute;
+        width: 200px;
+        height: 1px;
+        background: red;
+        margin-top: 50%;
+      }
+      .line-y {
+        position: absolute;
+        width: 1px;
+        height: 200px;
+        background: red;
+        margin-left: 50%;
+      }
+      .mask {
+        position: absolute;
+        width: 220px;
+        height: 140px;
+        background: red;
+        left: -10px;
+        top: -20px;
+        z-index: 99;
+      }
+      .max {
+        width: 40px;
+        height: 40px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="map">
+      <div class="mask"></div>
+      <div class="line-x"></div>
+      <div class="line-y"></div>
+      <div onclick="roteCLick(event)" class="map-item"><span>1</span></div>
+      <div onclick="roteCLick(event)" class="map-item"><span>2</span></div>
+      <div onclick="roteCLick(event)" class="map-item"><span>3</span></div>
+      <div onclick="roteCLick(event)" class="map-item"><span>4</span></div>
+      <div onclick="roteCLick(event)" class="map-item"><span>5</span></div>
+    </div>
+
+    <script>
+      const r = 100;
+      const cx = 100;
+      const cy = 100;
+      const halfRote = 360 / 30 / 2 + 1;
+      let reg = 0;
+
+      const dom = document.querySelectorAll(".map-item");
+
+      for (let i = 0; i < dom.length; i++) {
+        reg += 30;
+        if (reg === 90) {
+          dom[i].className = "map-item max";
+          dom[i].setAttribute(
+            "style",
+            `transform:translate(${
+              cx + r * Math.cos((reg * Math.PI) / 180) - 20
+            }px,${cy + r * Math.sin((reg * Math.PI) / 180) - 20}px)`
+          );
+        } else {
+          dom[i].className = "map-item";
+          dom[i].setAttribute(
+            "style",
+            `transform:translate(${
+              cx + r * Math.cos((reg * Math.PI) / 180) - 10
+            }px,${cy + r * Math.sin((reg * Math.PI) / 180) - 10}px)`
+          );
+        }
+
+        dom[i].setAttribute("reg", reg);
+        dom[i].setAttribute("sort", i);
+      }
+      let flag = true;
+      var startX, startY, endX, endY;
+      let roteNumRight = 0; // 向右转动次数
+      let roteNumLeft = 0; // 向左转动次数
+      // 监听触摸开始事件
+      document.addEventListener("touchstart", function (event) {
+        startX = event.touches[0].clientX;
+        startY = event.touches[0].clientY;
+      });
+
+      // 监听触摸结束事件
+      let regs = 0;
+      const rightMove = (dom, i, isClick) => {
+        dom[i].setAttribute("reg", 150);
+        //  dom[i].setAttribute("sort", dom.length - 1);
+        dom[i].setAttribute(
+          "style",
+          `transform:translate(${
+            cx + r * Math.cos((210 * Math.PI) / 180) - 10
+          }px,${cy + r * Math.sin((210 * Math.PI) / 180) - 10}px)`
+        );
+        if (!isClick) {
+          setTimeout(() => {
+            dom[i].setAttribute(
+              "style",
+              `transform:translate(${
+                cx + r * Math.cos((135 * Math.PI) / 180) - 10
+              }px,${
+                cy + r * Math.sin((135 * Math.PI) / 180) - 10
+              }px); transition: 0.3s ease;`
+            );
+          }, 200);
+          setTimeout(() => {
+            dom[i].setAttribute(
+              "style",
+              `transform:translate(${
+                cx + r * Math.cos((150 * Math.PI) / 180) - 10
+              }px,${
+                cy + r * Math.sin((150 * Math.PI) / 180) - 10
+              }px); transition: 0.5s ease;`
+            );
+          }, 300);
+        } else {
+          dom[i].setAttribute(
+            "style",
+            `transform:translate(${
+              cx + r * Math.cos((150 * Math.PI) / 180) - 10
+            }px,${
+              cy + r * Math.sin((150 * Math.PI) / 180) - 10
+            }px); transition: 0.5s ease;`
+          );
+        }
+      };
+      const leftMove = (dom, i, isClick) => {
+        dom[i].setAttribute("reg", 30);
+        //  dom[i].setAttribute("sort", dom.length - 1);
+        dom[i].setAttribute(
+          "style",
+          `transform:translate(${
+            cx + r * Math.cos((0 * Math.PI) / 180) - 10
+          }px,${cy + r * Math.sin((0 * Math.PI) / 180) - 10}px);`
+        );
+
+        if (!isClick) {
+          setTimeout(() => {
+            dom[i].setAttribute(
+              "style",
+              `transform:translate(${
+                cx + r * Math.cos((45 * Math.PI) / 180) - 10
+              }px,${
+                cy + r * Math.sin((45 * Math.PI) / 180) - 10
+              }px); transition: 0.3s ease;`
+            );
+          }, 200);
+          setTimeout(() => {
+            dom[i].setAttribute(
+              "style",
+              `transform:translate(${
+                cx + r * Math.cos((30 * Math.PI) / 180) - 10
+              }px,${
+                cy + r * Math.sin((30 * Math.PI) / 180) - 10
+              }px); transition: 0.5s ease;`
+            );
+          }, 300);
+        } else {
+          dom[i].setAttribute(
+            "style",
+            `transform:translate(${
+              cx + r * Math.cos((30 * Math.PI) / 180) - 10
+            }px,${
+              cy + r * Math.sin((30 * Math.PI) / 180) - 10
+            }px); transition: 0.5s ease;`
+          );
+        }
+      };
+      const setRightMove = (dom, i) => {
+        let dreg = Number(dom[i].getAttribute("reg")) - 30;
+        dom[i].setAttribute("reg", dreg);
+        if (+dom[i].getAttribute("reg") === 90) {
+          dom[i].className = "map-item max";
+
+          dom[i].setAttribute(
+            "style",
+            `transform:translate(${
+              cx + r * Math.cos((dreg * Math.PI) / 180) - 20
+            }px,${cy + r * Math.sin((dreg * Math.PI) / 180) - 20}px);  `
+          );
+        } else {
+          dom[i].className = "map-item";
+
+          dom[i].setAttribute(
+            "style",
+            `transform:translate(${
+              cx + r * Math.cos((dreg * Math.PI) / 180) - 10
+            }px,${cy + r * Math.sin((dreg * Math.PI) / 180) - 10}px);  `
+          );
+        }
+      };
+      const setLeftMove = (dom, i) => {
+        const dreg = Number(dom[i].getAttribute("reg")) + 30;
+        dom[i].setAttribute("reg", dreg);
+        if (+dom[i].getAttribute("reg") === 90) {
+          dom[i].className = "map-item max";
+
+          dom[i].setAttribute(
+            "style",
+            `transform:translate(${
+              cx + r * Math.cos((dreg * Math.PI) / 180) - 20
+            }px,${cy + r * Math.sin((dreg * Math.PI) / 180) - 20}px);  `
+          );
+        } else {
+          dom[i].className = "map-item";
+          dom[i].setAttribute(
+            "style",
+            `transform:translate(${
+              cx + r * Math.cos((dreg * Math.PI) / 180) - 10
+            }px,${cy + r * Math.sin((dreg * Math.PI) / 180) - 10}px);  `
+          );
+        }
+      };
+      const funLeftRote = (isClick) => {
+        let isRote0 = [...Array.from(dom)].every((it) => {
+          return Math.abs(it.getAttribute("reg")) !== 0;
+        });
+        const isRote = Math.abs(dom[0].getAttribute("reg")) === 90;
+        for (let i = 0; i < dom.length; i++) {
+          const domreg = dom[i].getAttribute("reg");
+          /* 第一个是否旋转到了90度 */
+
+          if (isRote && dom.length <= 4) {
+            /* 如果最后一个角度等于90 */
+            console.log("无法转动");
+          } else {
+            setLeftMove(dom, i);
+
+            if (isRote0 && dom.length >= 5) {
+              const sort = dom[i].getAttribute("sort");
+              let sortIndex = null;
+              if (+sort === dom.length - 1) {
+                dom[i].setAttribute("sort", 0);
+
+                sortIndex = i;
+                leftMove(dom, i, isClick);
+              } else {
+                dom[i].setAttribute("sort", +sort + 1);
+              }
+            } else if (Math.abs(domreg) === 0) {
+              leftMove(dom, i, isClick);
+            }
+          }
+        }
+      };
+      const funRightRote = (isClick) => {
+        let isRote180 = [...Array.from(dom)].every((it) => {
+          return Math.abs(it.getAttribute("reg")) !== 180;
+        });
+        const isRote = Math.abs(dom[dom.length - 1].getAttribute("reg")) === 90;
+        for (let i = 0; i < dom.length; i++) {
+          /* 获取当前每个元素转动的角度 */
+          const domreg = dom[i].getAttribute("reg");
+          /* 最后一个是否旋转到了90度 */
+
+          if (isRote && dom.length <= 4) {
+            /* 如果最后一个角度等于90 */
+          } else {
+            setRightMove(dom, i);
+
+            if (isRote180 && dom.length >= 5) {
+              const sort = dom[i].getAttribute("sort");
+              let sortIndex = null;
+              if (+sort === 0) {
+                dom[i].setAttribute("sort", dom.length - 1);
+
+                sortIndex = i;
+                rightMove(dom, i, isClick);
+              } else {
+                dom[i].setAttribute("sort", +sort - 1);
+              }
+            } else if (Math.abs(domreg) === 180) {
+              rightMove(dom, i, isClick);
+            }
+          }
+        }
+      };
+      document.addEventListener("touchend", function (event) {
+        endX = event.changedTouches[0].clientX;
+        endY = event.changedTouches[0].clientY;
+
+        var deltaX = endX - startX;
+        var deltaY = endY - startY;
+
+        // 判断滑动方向
+        if (Math.abs(deltaX) > Math.abs(deltaY)) {
+          if (deltaX > 0) {
+            // 向右滑动
+            funRightRote();
+          } else {
+            // 向左滑动
+            funLeftRote();
+          }
+        }
+      });
+      function roteCLick(e) {
+        if (e.target.tagName === "SPAN" || e.target.closest("span")) {
+          // 如果点击目标是<span>元素或<span>元素的子元素，则不执行任何操作
+          return;
+        }
+        const max = 180;
+        const min = 0;
+        const center = 90;
+        const current = Math.abs(e.target.getAttribute("reg"));
+        if (current === 90) {
+          return;
+        }
+
+        if (center > current > min) {
+          // 点击的右边
+          const move = (center - current) / 30;
+          for (let i = 0; i < move; i++) {
+            funLeftRote(true);
+          }
+        } else {
+          // 点击的左边
+          const move = (current - center) / 30;
+          for (let i = 0; i < move; i++) {
+            funRightRote(true);
+          }
+        }
+      }
+    </script>
+  </body>
+</html>
